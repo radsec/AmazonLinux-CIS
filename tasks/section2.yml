@@ -227,10 +227,14 @@
       state: stopped
       enabled: no
   ignore_errors: true
-  when: amazonlinuxcis_rsh_server == false and rsh_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - amazonlinuxcis_rsh_server is defined
+    - (not amazonlinuxcis_rsh_server and rsh_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.1.6
 
 - name: "SCORED | 2.1.6 | PATCH | Ensure rsh server is not enabled | rlogin"
@@ -239,7 +243,9 @@
       state: stopped
       enabled: no
   ignore_errors: true
-  when: amazonlinuxcis_rsh_server == false and rlogin_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_rsh_server and rlogin_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
@@ -251,10 +257,13 @@
       state: stopped
       enabled: no
   ignore_errors: true
-  when: amazonlinuxcis_rsh_server == false and rexec_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_rsh_server and rexec_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.1.6
 
 - name: "SCORED | 2.1.6 | PATCH | Ensure rsh server is not enabled | rexec"
@@ -343,10 +352,13 @@
       state: stopped
       enabled: no
   ignore_errors: true
-  when: amazonlinuxcis_telnet_server == false and telnet_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_telnet_server and telnet_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.1.8
 
 - name: "SCORED | 2.1.9 | PATCH | Ensure tftp server is not enabled"
@@ -357,16 +369,20 @@
       - level1
       - scored
       - patch
+      - disable_service_checks
       - rule_2.1.9
 
 - name: "SCORED | 2.1.9 | PATCH | Ensure tftp server is not enabled"
   command: chkconfig tftp off
   notify: restart xinetd
-  when: tftp_service.stat.exists and amazonlinuxcis_tftp_server == false
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (tftp_service.stat.exists and not amazonlinuxcis_tftp_server)
   tags:
       - level1
       - scored
       - patch
+      - disable_service_checks
       - rule_2.1.9
 
 - name: "SCORED | 2.1.10 | PATCH | Ensure rsync service is not enabled "
@@ -375,10 +391,13 @@
       state: stopped
       enabled: no
   ignore_errors: true
-  when: amazonlinuxcis_rsyncd_server == false and rsyncd_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_rsyncd_server and rsyncd_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.1.10
 
 - name: "SCORED | 2.1.11 | PATCH | Ensure xinetd is not enabled"
@@ -399,6 +418,8 @@
   yum:
       name: "{{ amazonlinuxcis_time_synchronization }}"
       state: present
+  when:
+    - amazonlinuxcis_time_synchronization is defined
   tags:
       - level1
       - patch
@@ -410,6 +431,8 @@
       state: started
       enabled: yes
   ignore_errors: true
+  when:
+    - amazonlinuxcis_time_synchronization is defined
   tags:
       - level1
       - patch
@@ -421,7 +444,9 @@
       state: stopped
       enabled: no
   ignore_errors: true
-  when: amazonlinuxcis_time_synchronization == "chrony" and ntpd_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_time_synchronization is defined
+    - amazonlinuxcis_time_synchronization == "chrony" and ntpd_service_status.stdout == "loaded"
   tags:
       - level1
       - patch
@@ -493,7 +518,9 @@
   yum:
       name: "{{item}}"
       state: absent
-  when: not amazonlinuxcis_xwindows_required
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - not amazonlinuxcis_xwindows_required
   with_items:
       - "@X Window System"
       - "xorg-x11*"
@@ -502,6 +529,7 @@
       - scored
       - xwindows
       - patch
+      - disable_service_checks
       - rule_2.2.2
 
 - name: "SCORED | 2.2.3 | PATCH | Ensure Avahi Server is not enabled"
@@ -510,13 +538,16 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_avahi_server == false and avahi_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_avahi_server and avahi_service_status.stdout == "loaded")
   tags:
       - level1
       - scored
       - avahi
       - services
       - patch
+      - disable_service_checks
       - rule_2.2.3
 
 - name: "SCORED | 2.2.4 | PATCH | Ensure CUPS is not enabled"
@@ -525,13 +556,16 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_cups_server == false and cups_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks 
+    - (not amazonlinuxcis_cups_server and cups_service_status.stdout == "loaded")
   tags:
       - level1
       - scored
       - cups
       - services
       - patch
+      - disable_service_checks
       - rule_2.2.4
 
 - name: "SCORED | 2.2.5 | PATCH | Ensure DHCP Server is not enabled"
@@ -540,13 +574,16 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_dhcp_server == false and dhcpd_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_dhcp_server and dhcpd_service_status.stdout == "loaded")
   tags:
       - level1
       - scored
       - dhcp
       - services
       - patch
+      - disable_service_checks
       - rule_2.2.5
 
 - name: "SCORED | 2.2.6 | PATCH | Ensure LDAP server is not enabled"
@@ -555,13 +592,16 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_ldap_server == false and slapd_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_ldap_server and slapd_service_status.stdout == "loaded")
   tags:
       - level1
       - scored
       - ldap
       - services
       - patch
+      - disable_service_checks
       - rule_2.2.6
 
 - name: "SCORED | 2.2.7 | PATCH | Ensure NFS and RPC are not enabled"
@@ -570,7 +610,9 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_nfs_rpc_server == false and nfs_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_nfs_rpc_server and nfs_service_status.stdout == "loaded")
   tags:
       - level1
       - scored
@@ -578,6 +620,7 @@
       - rpc
       - services
       - patch
+      - disable_service_checks
       - rule_2.2.7
 
 - name: "SCORED | 2.2.7 | PATCH | Ensure NFS and RPC are not enabled"
@@ -586,7 +629,9 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_nfs_rpc_server == false and rpcbind_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_nfs_rpc_server and rpcbind_service_status.stdout == "loaded")
   tags:
       - level1
       - scored
@@ -594,6 +639,7 @@
       - rpc
       - services
       - patch
+      - disable_service_checks
       - rule_2.2.7
 
 - name: "SCORED | 2.2.8 | PATCH | Ensure DNS Server is not enabled"
@@ -602,10 +648,13 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_named_server == false and named_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_named_server and named_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.8
 
 - name: "SCORED | 2.2.9 | PATCH | Ensure FTP Server is not enabled"
@@ -614,10 +663,13 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_vsftpd_server == false and vsftpd_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_vsftpd_server and vsftpd_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.9
 
 - name: "SCORED | 2.2.10 | PATCH | Ensure HTTP server is not enabled"
@@ -626,10 +678,13 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_httpd_server == false and httpd_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_httpd_server and httpd_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.10
 
 - name: "SCORED | 2.2.11 | PATCH | Ensure IMAP and POP3 server is not enabled"
@@ -638,10 +693,13 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_dovecot_server == false and dovecot_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_dovecot_server and dovecot_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.11
 
 - name: "SCORED | 2.2.12 | PATCH | Ensure Samba is not enabled"
@@ -650,10 +708,13 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_smb_server == false and smb_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_smb_server and smb_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.12
 
 - name: "SCORED | 2.2.13 | PATCH | Ensure HTTP Proxy Server is not enabled"
@@ -662,10 +723,13 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_squid_server == false and squid_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_squid_server and squid_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.13
 
 - name: "SCORED | 2.2.14 | PATCH | Ensure SNMP Server is not enabled"
@@ -674,10 +738,13 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_snmp_server == false and snmpd_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_snmp_server and snmpd_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.14
 
 - name: "SCORED | 2.2.15 | PATCH | Ensure mail transfer agent is configured for local-only mode"
@@ -685,10 +752,13 @@
       dest: /etc/postfix/main.cf
       regexp: "^(#)?inet_interfaces"
       line: "inet_interfaces = localhost"
-  when: amazonlinuxcis_is_mail_server == false and postfix_installed.rc == 0
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_is_mail_server and postfix_installed.rc == 0)
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.15
 
 - name: "SCORED | 2.2.16 | PATCH | Ensure NIS Server is not enabled"
@@ -697,10 +767,13 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_nis_server == false and ypserv_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_nis_server and ypserv_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.16
 
 - name: "SCORED | 2.2.19 | PATCH | Ensure tftp server is not enabled"
@@ -709,13 +782,16 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_tftp_server == false and tftp_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_tftp_server and tftp_service_status.stdout == "loaded")
   tags:
       - level1
       - scored
       - insecure_services
       - tftp
       - patch
+      - disable_service_checks
       - rule_2.2.19
 
 - name: "SCORED | 2.2.21 | PATCH | Ensure talk server is not enabled"
@@ -724,58 +800,76 @@
       state: stopped
       enabled: no
   ignore_errors: yes
-  when: amazonlinuxcis_ntalk_server == false and ntalk_service_status.stdout == "loaded"
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - (not amazonlinuxcis_ntalk_server and ntalk_service_status.stdout == "loaded")
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.2.21
 
 - name: "SCORED | 2.3.1 | PATCH | Ensure NIS Client is not installed"
   yum:
       name: ypbind
       state: absent
-  when: amazonlinuxcis_ypbind_required == false
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - not amazonlinuxcis_ypbind_required
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.3.1
 
 - name: "SCORED | 2.3.2 | PATCH | Ensure rsh client is not installed"
   yum:
       name: rsh
       state: absent
-  when: amazonlinuxcis_rsh_required == false
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - not amazonlinuxcis_rsh_required
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.3.2
 
 - name: "SCORED | 2.3.3 | PATCH | Ensure talk client is not installed"
   yum:
       name: talk
       state: absent
-  when: amazonlinuxcis_talk_required == false
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - not amazonlinuxcis_talk_required
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.3.3
 
 - name: "SCORED | 2.3.4 | PATCH | Ensure telnet client is not installed"
   yum:
       name: telnet
       state: absent
-  when: amazonlinuxcis_telnet_required == false
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - not amazonlinuxcis_telnet_required
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.3.4
 
 - name: "SCORED | 2.3.5 | PATCH | Ensure LDAP client is not installed"
   yum:
       name: openldap-clients
       state: absent
-  when: amazonlinuxcis_openldap_clients_required == false
+  when:
+    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - not amazonlinuxcis_openldap_clients_required
   tags:
       - level1
       - patch
+      - disable_service_checks
       - rule_2.3.5
