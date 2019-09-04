@@ -21,10 +21,10 @@
 # tasks file for AmazonLinuxCIS
 - name: Check OS version and family
   fail:
-      msg: "This role can only be run agaist Amazon Linux 2017.9. {{ ansible_distribution }} {{ansible_distribution_version }} is not supported."
+      msg: "This role can only be run against Amazon Linux 1. {{ ansible_distribution }} {{ansible_distribution_version }} is not supported."
   when:
       - ansible_distribution == 'Amazon'
-      - ansible_distribution_version is version('2017.09', '!=')
+      - ansible_distribution_version is version('2', '!=')
   tags:
       - always
 
@@ -33,7 +33,7 @@
       msg: "PASS | {{ ansible_distribution }} {{ansible_distribution_version }} is supported."
   when:
       - ansible_distribution == 'Amazon'
-      - ansible_distribution_version is version('2017.09', '>=')
+      - ansible_distribution_version is version('2017.09', '>=') or ansible_distribution_version is version('2018.*', '>=') or ansible_distribution_version is version('2018.*', '>=') or ansible_distribution_version is version('2019.*', '>=') or ansible_distribution_version is version('2020.*', '>=') or ansible_distribution_version is version('202*', '>=')
   tags:
       - always
 
