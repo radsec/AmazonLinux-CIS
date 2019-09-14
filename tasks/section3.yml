@@ -20,6 +20,7 @@
 - name: "SCORED | 3.1.1 | PATCH | Ensure IP forwarding is disabled"
   sysctl:
       name: net.ipv4.ip_forward
+      sysctl_set: yes
       value: 0
       state: present
       reload: yes
@@ -133,6 +134,7 @@
   sysctl:
       name: net.ipv4.icmp_echo_ignore_broadcasts
       value: 1
+      sysctl_set: yes
       state: present
       reload: yes
       ignoreerrors: yes
@@ -150,6 +152,7 @@
       value: 1
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   notify:
       - sysctl flush ipv4 route table
@@ -183,6 +186,7 @@
       name: net.ipv4.tcp_syncookies
       value: 1
       state: present
+      sysctl_set: yes
       reload: yes
       ignoreerrors: yes
   notify:

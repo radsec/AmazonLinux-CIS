@@ -753,12 +753,11 @@
       regexp: "^(#)?inet_interfaces"
       line: "inet_interfaces = localhost"
   when:
-    - amazonlinuxcis_disable_service_checks is defined and amazonlinuxcis_disable_service_checks
+    - amazonlinuxcis_disable_service_checks is defined
     - (not amazonlinuxcis_is_mail_server and postfix_installed.rc == 0)
   tags:
       - level1
       - patch
-      - disable_service_checks
       - rule_2.2.15
 
 - name: "SCORED | 2.2.16 | PATCH | Ensure NIS Server is not enabled"
